@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
-import { getItems, searchItem } from "../api/apiRequests";
+import { getItems } from "../api/apiRequests";
 
 const ACTIONS = {
   MAKE_REQUEST: "make-request",
@@ -26,7 +26,7 @@ const reducer = (state, action) => {
   }
 };
 
-export default function useFetchData(target, search) {
+export default function useFetchData(target) {
   const [state, dispatch] = useReducer(reducer, {
     data: [],
     loading: true,
@@ -36,22 +36,19 @@ export default function useFetchData(target, search) {
     const cancelToken = axios.CancelToken.source();
     dispatch({ type: ACTIONS.MAKE_REQUEST });
 
-    // console.log(search)
-    search
-      ? searchItem(cancelToken, target, search)
-      : getItems(cancelToken, target)
-          .then((res) => {
-            dispatch({ type: ACTIONS.GET_DATA, payload: { data: res.data } });
-          })
-          .catch((e) => {
-            if (axios.isCancel(e)) return;
-            dispatch({ type: ACTIONS.ERROR, payload: { error: e } });
-          });
+    getItems(cancelToken, target)
+      .then((res) => {
+        dispatch({ type: ACTIONS.GET_DATA, payload: { data: res.data } });
+      })
+      .catch((e) => {
+        if (axios.isCancel(e)) return;
+        dispatch({ type: ACTIONS.ERROR, payload: { error: e } });
+      });
 
     return () => {
       cancelToken.cancel();
     };
-  }, [target, search]);
+  }, [target]);
 
   return state;
 }

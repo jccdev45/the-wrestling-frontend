@@ -7,16 +7,30 @@ import WrestlerDetail from "../components/wrestlerDetail/WrestlerDetail";
 
 export default function Wrestlers() {
   const path = "/wrestlers";
-  const [search, setSearch] = useState("");
   const { data, loading, error } = useFetchData(path);
+  const [search, setSearch] = useState("");
 
   const handleChange = (e) => {
     setSearch(e.target.value);
   };
 
-  const wrestlerMap = data.map((wrestler) => (
-    <WrestlerDetail key={wrestler._id} wrestler={wrestler} />
-  ));
+  const wrestlerMap = () => {
+    let filtered = data.filter((wrestler) => {
+      if (wrestler.name.toLowerCase().includes(search.toLowerCase())) {
+        return wrestler;
+      }
+      if (wrestler.dob.toLowerCase().includes(search.toLowerCase())) {
+        return wrestler;
+      }
+      if (wrestler.nationality.toLowerCase().includes(search.toLowerCase())) {
+        return wrestler;
+      }
+    });
+
+    return filtered.map((wrestler) => (
+      <WrestlerDetail key={wrestler._id} wrestler={wrestler} />
+    ));
+  };
 
   return (
     <Layout>
@@ -24,7 +38,7 @@ export default function Wrestlers() {
         <Search search={search} handleChange={(e) => handleChange(e)} />
         {loading && <Loading />}
         {error && <h1>There was an error please refresh.</h1>}
-        {wrestlerMap}
+        {data.length ? wrestlerMap() : ""}
       </div>
     </Layout>
   );

@@ -1,4 +1,5 @@
 import api from "./apiConfig";
+import axios from "axios";
 
 export const getItems = async (cancelToken, path) => {
   try {
@@ -20,24 +21,22 @@ export const getItemById = async (path, id) => {
 
 export const searchItem = async (cancelToken, path, search) => {
   try {
-    console.log(`${path}/search`, search);
-    // let rep = new RegExp(`#${search}#`, "g");
-    // console.log(rep);
-    const res = await api.post(
-      `${path}/search`,
-      {
-        // cancelToken: cancelToken.token,
-        // params: {
-        typePrimary: search,
-        // typeSecondary: { $all: [`/${search}/`] },
-        // participants: { $all: search },
-        // title: { $all: [`/${search}/`] },
-        // show: `/${search}/`,
-        // outcome: `/${search}/`,
-        // date: `/${search}/`,
-      }
-      // }
-    );
+    const res = await axios({
+      method: "post",
+      url: `http://localhost:3000${path}/search`,
+      cancelToken: cancelToken.token,
+      data: {
+        // typePrimary: search,
+        // typeSecondary: { $all: [search] },
+        participants: { $all: search },
+        // title: { $all: [search] },
+        // show: search,
+        // outcome: search,
+        // date: search,
+      },
+    })
+      .then((res) => console.log(res.data))
+      .catch((e) => console.log(e));
     return res;
   } catch (error) {
     throw error;

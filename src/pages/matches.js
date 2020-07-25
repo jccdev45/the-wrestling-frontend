@@ -7,16 +7,31 @@ import MatchDetail from "../components/matchDetail/MatchDetail";
 
 export default function Matches() {
   const path = "/matches";
+  const { data, loading, error } = useFetchData(path);
   const [search, setSearch] = useState("");
-  const { data, loading, error } = useFetchData(path, search);
 
   const handleChange = (e) => {
     setSearch(e.target.value);
   };
 
-  const matchMap = data.map((match) => (
-    <MatchDetail key={match._id} match={match} />
-  ));
+  const matchMap = () => {
+    let filtered = data.filter((match) => {
+      if (match.typePrimary.toLowerCase().includes(search.toLowerCase())) {
+        return match;
+      }
+      if (match.show.toLowerCase().includes(search.toLowerCase())) {
+        return match;
+      }
+      if (match.outcome.toLowerCase().includes(search.toLowerCase())) {
+        return match;
+      }
+      if (match.date.toLowerCase().includes(search.toLowerCase())) {
+        return match;
+      }
+    });
+
+    return filtered.map((match) => <MatchDetail key={match._id} match={match} />);
+  };
 
   return (
     <Layout>
@@ -24,7 +39,7 @@ export default function Matches() {
         <Search search={search} handleChange={(e) => handleChange(e)} />
         {loading && <Loading />}
         {error && <h1>There was an error please refresh.</h1>}
-        {matchMap}
+        {data.length ? matchMap() : ''}
       </div>
     </Layout>
   );
